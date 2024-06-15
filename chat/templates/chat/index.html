@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Rooms</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <h1 class="text-center my-4">Available Chat Rooms</h1>
+                <ul class="list-group mb-4">
+                    {% for room in rooms %}
+                        <li class="list-group-item">
+                            <a href="{% url 'room' room_name=room.name %}">{{ room.name }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <h2 class="text-center my-4">Create a New Room</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary btn-block">Create Room</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
