@@ -33,7 +33,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
         const roomName = "{{ room_name }}";
-        const chatSocket = new WebSocket(
+        let chatSocket = new WebSocket(
             'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
         );
 
@@ -50,18 +50,34 @@
             console.error('Chat socket closed unexpectedly');
         };
 
-        document.querySelector('#chat-message-submit').onclick = function(e) {
+        function sendMessage() {
             const messageInputDom = document.querySelector('#chat-message-input');
             const message = messageInputDom.value;
-            chatSocket.send(JSON.stringify({
-                'message': message
-            }));
-            messageInputDom.value = '';
+
+            if (chatSocket.readyState === WebSocket.OPEN) {
+                chatSocket.send(JSON.stringify({
+                    'message': message
+                }));
+                messageInputDom.value = '';
+            } else {
+                console.error('WebSocket is not open: ', chatSocket.readyState);
+            }
+        }
+
+        document.querySelector('#chat-message-submit').onclick = function(e) {
+            sendMessage();
         };
 
         document.querySelector('#chat-message-input').onkeyup = function(e) {
             if (e.keyCode === 13) {  // Enter key
-                document.querySelector('#chat-message-submit').click();
+                sendMessage();
+            }
+        };
+
+        window.onbeforeunload = function() {
+            if (chatSocket) {
+                chatSocket.onclose = function () {}; // disable onclose handler first
+                chatSocket.close();
             }
         };
     </script>
