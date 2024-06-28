@@ -1,22 +1,31 @@
-# docker-compose.yml
-version: '3'
 
 services:
-  redis:
-    image: redis:latest
-    container_name: redis
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: newdatabase
+      POSTGRES_USER: newuser
+      POSTGRES_PASSWORD: newpassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     ports:
-      - "6379:6379"
+      - "5432:5432"
 
   web:
     build: .
-    command: daphne -b 0.0.0.0 -p 8000 chat_project.asgi:application
+    command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - .:/app
+      - .:/code
     ports:
       - "8000:8000"
     depends_on:
-      - redis
+      - db
     environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+      - DB_NAME=newdatabase
+      - DB_USER=newuser
+      - DB_PASSWORD=newpassword
+      - DB_HOST=db
+      - DB_PORT=5432
+
+volumes:
+  postgres_data:
